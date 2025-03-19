@@ -47,7 +47,7 @@ authRouter.post('/api/signin', async (req, res) => {
         const { password: _, ...userWithoutPassword } = findUser._doc;
 
         // Send the response
-        return res.json({ token, ...userWithoutPassword });
+        return res.json({ token,user:userWithoutPassword });
 
     } catch (error) {
         return res.status(500).json({ error: error.message });

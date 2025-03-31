@@ -98,5 +98,16 @@ authRouter.put('/api/user/update/:id', async (req, res) => {
       return res.status(500).json({ error: "Lỗi cập nhật thông tin: " + error.message });
     }
   });
+
+  // fetch user by id
+authRouter.get('/api/user', async (req, res) => {
+    try {
+      const users = await User.find().select('-password');
+      return res.status(200).json(users);
+    } catch (error) {
+        return res.status(500).json({ error: "Lỗi lấy thông tin người dùng: " + error.message });
+    }
+    });
+   
   
 module.exports = authRouter;

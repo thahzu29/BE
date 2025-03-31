@@ -22,8 +22,8 @@ VendorRouter.post('/api/vendor/signup', async (req, res) => {
       fullName,
       email,
       phone,
-      image,
-      address,
+      image: image || "",
+      address: address || "",
       password: hashedPassword,
     });
 
@@ -38,11 +38,14 @@ VendorRouter.post('/api/vendor/signup', async (req, res) => {
 // Signin API
 VendorRouter.post('/api/vendor/signin', async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const findVendor = await Vendor.findOne({ email });
+    const { loginInput, password } = req.body;
+
+    const findVendor = await Vendor.findOne({
+      $or: [{ email: loginInput }, { phone: loginInput }]
+    });
 
     if (!findVendor) {
-      return res.status(400).json({ msg: "Không tìm thấy vendor với email này" });
+      return res.status(400).json({ msg: "Không tìm thấy vendor với thông tin đã cung cấp" });
     }
 
     const isMatch = await bcrypt.compare(password, findVendor.password);
@@ -56,14 +59,7 @@ VendorRouter.post('/api/vendor/signin', async (req, res) => {
 
     return res.json({
       token,
-      vendor: {
-        id: findVendor._id,
-        fullName: findVendor.fullName,
-        email: findVendor.email,
-        phone: findVendor.phone,
-        image: findVendor.image,
-        address: findVendor.address,
-      },
+      vendor: vendorWithoutPassword,
     });
 
   } catch (error) {
@@ -84,4 +80,16 @@ VendorRouter.get('/api/vendor/profile', authVendor, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+//fetch all vendors(exclude password)
+VendorRouter.get('/api/vendors',async(req,res)=>{
+  try {
+    const vendors = await Vendor.find().select('-password'); 
+    res.status(200).json(vendors);
+  } catch (e) {
+      res.status(500).json({error:e.message});
+  }
+});
+
+
 module.exports = VendorRouter;

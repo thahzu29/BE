@@ -48,7 +48,9 @@ const productSchema = mongoose.Schema({
     recommend:{
         type:Boolean,
         default:false,
-    }
+    },
+    averageRating: { type: Number, default: 0 }, 
+    totalRatings: { type: Number, default: 0 }, 
 });
 const Product = mongoose.model("Product",productSchema);
 module.exports = Product;
